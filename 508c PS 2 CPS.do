@@ -372,8 +372,18 @@ set more off
 **                                   P2                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
-**code goes here (without the stars before and after, of course)**
-
+**Generate log hourly wage variable**
+gen hourlywage = (incwage)/(wkswork1*uhrswork)
+//some of the incwage inputs were "0" despite there being a number of hours worked//
+**Generate race dummies**
+gen white=1 if race==100
+replace white=0 if race!=100
+gen black=1 if race==200
+replace black=0 if race!=200
+gen other=1 if race > 200
+replace other=0 if race<=200
+**education variable for years of schooling**
+gen eduyears-
 
 ********************************************************************************
 **                                   P3                                       **
