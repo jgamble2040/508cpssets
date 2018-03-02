@@ -411,7 +411,13 @@ drop if incwage==0
 ********************************************************************************
 //comment//
 **code**
-
+reg hourlywage eduyears, robust
+//Estimated return is 2.25 percent increase in wages for a year increase in education.//
+summarize hourlywage
+summarize eduyears
+**hand calculated the correlation using forumula**
+correlate hourlywage eduyears
+**hand wrote the relationship between squared r and R^2**
 
 ********************************************************************************
 **                                   P4                                       **
