@@ -65,25 +65,38 @@ correlate hourlywage eduyears
 ********************************************************************************
 **                                   P4                                       **
 ********************************************************************************
-//comment//
-**code**
-
+//Two different versions of the Mincerian Wage Equation.//
+**multivariate regression**
+reg hourlywage eduyears exper exper2, robust
+**Series of bivariate regressions as application of Frisch-Waugh Theorem**
+reg hourlywage exper exper2, robust
+predict u_y, residual
+reg eduyears exper exper2, robust
+predict u_x, residual
+reg u_y u_x
 ********************************************************************************
 **                                   P5                                       **
 ********************************************************************************
-//comment//
-**code**
+//Extended Mincerian Equation with race and sex controls//
+local extendedcontrols race sex
+reg hourlywage eduyears exper exper2 `extendedcontrols', robust
 
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
-//comment//
+//Generate the wage-experience profile.//
 **code**
-
+egen edubar=mean(eduyears)
+egen blackbar=mean(black)
+egen otherbar=mean(other)
+egen sexbar=mean(sex)
+reg hourlywage edubar exper exper2 blackbar otherbar sexbar, robust
+sort exper exper2
+graph twoway (line hourlywage exper) 
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
-//comment//
+//Change to NLSY data and regenerate variables//
 **code**
 
 ********************************************************************************
