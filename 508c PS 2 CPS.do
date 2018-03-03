@@ -98,27 +98,55 @@ graph twoway (line hourlywage exper)
 ********************************************************************************
 //Change to NLSY data and regenerate variables//
 **code**
-
+use nlsy79.dta, clear
+gen hourlywage=laborinc07/hours07
+gen age=(age79+28)
+//Age in 2007//
+gen exper = age - educ - 5 
+gen exper2 = (exper^2)
+drop if hours07 < 1750
+summarize
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
-//comment//
+//Calculate extended Mincerian Wage Equation//
 **code**
+local extendedcontrols black hisp male
+reg hourlywage educ exper exper2 `extendedcontrols', robust
 
 ********************************************************************************
 **                                   P9                                       **
 ********************************************************************************
-//comment//
+//It is difficult to infer a causal effect from the beta as both data sets are 
+//observational. There is certainly correlation. However, without a counter
+//factual and randomize factors in the  error terms, I'm not sure if the betas
+//represent causal effects.//
 **code**
 
 ********************************************************************************
 **                                   P10                                      **
 ********************************************************************************
-//comment//
+//Notes on paper.//
 **code**
+local extendedcontrols black hisp male
+reg hourlywage educ exper exper2 `extendedcontrols', robust
+local AFQTcontrols black hisp male afqt81
+reg hourlywage educ exper exper2 `AFQTcontrols', robust
+local extendedcontrols black hisp male
+local childhoodcontrols foreign urban14 mag14 news14 lib14 educ_mom educ_dad numsibs
+reg hourlywage educ exper exper2 `extendedcontrols' `childhoodcontrols', robust
+local AFQTcontrols black hisp male afqt81
+local childhoodcontrols foreign urban14 mag14 news14 lib14 educ_mom educ_dad numsibs
+reg hourlywage educ exper exper2 `AFQTcontrols' `childhoodcontrols', robust
+//Estimated return with AFQT control goes down alot. This suggests that overall 
+//intelligence may have a confounding impact on both wages and education levels.
+//Childhood controls led to a smaller decrease, confirming the hypothesis that 
+//years of education may already capture the effects of childhood on wages.
 
 ********************************************************************************
 **                                   P11                                      **
 ********************************************************************************
-//comment//
+//Helpful for understanding the relationships but can change dramatically depending
+//on sample composition and controls. Causal implications are unclear as it is
+//impossible to randomize individuals entire lives.//
 **code**
