@@ -16,7 +16,7 @@ set more off
 ********************************************************************************
 //comment code if it needs some explanations//
 **Generate log hourly wage variable**
-gen hourlywage = ln(incwage)/(wkswork1*uhrswork)
+gen hourlywage = ln((incwage)/(wkswork1*uhrswork))
 //some of the incwage inputs were "0" despite there being a number of hours worked//
 **Generate race dummies**
 gen white=1 if race==100
@@ -26,6 +26,7 @@ replace black=0 if race!=200
 gen other=1 if race > 200
 replace other=0 if race<=200
 gen male=1 if sex==1
+replace male=0 if male==.
 **education variable for years of schooling**
 gen eduyears=educ
 replace eduyears=0.5 if educ==2
@@ -70,17 +71,18 @@ correlate hourlywage eduyears
 //Two different versions of the Mincerian Wage Equation.//
 **multivariate regression**
 reg hourlywage eduyears exper exper2, robust
+lincom exper+exper2
 **Series of bivariate regressions as application of Frisch-Waugh Theorem**
 reg hourlywage exper exper2, robust
 predict u_y, residual
 reg eduyears exper exper2, robust
 predict u_x, residual
-reg u_y u_x
+reg u_y u_x, robust
 ********************************************************************************
 **                                   P5                                       **
 ********************************************************************************
 //Extended Mincerian Equation with race and sex controls//
-local extendedcontrols race male
+local extendedcontrols black other male
 reg hourlywage eduyears exper exper2 `extendedcontrols', robust
 
 ********************************************************************************
@@ -92,9 +94,10 @@ egen edubar=mean(eduyears)
 egen blackbar=mean(black)
 egen otherbar=mean(other)
 egen sexbar=mean(male)
-reg hourlywage edubar exper exper2 blackbar otherbar sexbar, robust
+reg hourlywage eduyears exper exper2 black other male, robust
+gen pointhourlywage = _b[eduyears]*edubar + _b[exper]*exper + _b[exper2]*exper2 + _b[black]*blackbar + _b[other]*otherbar + _b[male]*sexbar + _b[_cons]
 sort exper exper2
-graph twoway (line hourlywage exper) 
+graph twoway (line pointhourlywage exper)
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
