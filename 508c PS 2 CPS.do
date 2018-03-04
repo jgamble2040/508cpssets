@@ -25,6 +25,7 @@ gen black=1 if race==200
 replace black=0 if race!=200
 gen other=1 if race > 200
 replace other=0 if race<=200
+gen male=1 if sex==1
 **education variable for years of schooling**
 gen eduyears=educ
 replace eduyears=0.5 if educ==2
@@ -79,7 +80,7 @@ reg u_y u_x
 **                                   P5                                       **
 ********************************************************************************
 //Extended Mincerian Equation with race and sex controls//
-local extendedcontrols race sex
+local extendedcontrols race male
 reg hourlywage eduyears exper exper2 `extendedcontrols', robust
 
 ********************************************************************************
@@ -90,7 +91,7 @@ reg hourlywage eduyears exper exper2 `extendedcontrols', robust
 egen edubar=mean(eduyears)
 egen blackbar=mean(black)
 egen otherbar=mean(other)
-egen sexbar=mean(sex)
+egen sexbar=mean(male)
 reg hourlywage edubar exper exper2 blackbar otherbar sexbar, robust
 sort exper exper2
 graph twoway (line hourlywage exper) 
