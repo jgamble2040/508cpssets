@@ -16,7 +16,7 @@ set more off
 ********************************************************************************
 //comment code if it needs some explanations//
 **Generate log hourly wage variable**
-gen hourlywage = (incwage)/(wkswork1*uhrswork)
+gen hourlywage = ln(incwage)/(wkswork1*uhrswork)
 //some of the incwage inputs were "0" despite there being a number of hours worked//
 **Generate race dummies**
 gen white=1 if race==100
@@ -49,6 +49,7 @@ gen exper2 = (exper^2)
 replace hourlywage=. if uhrswork < 35
 drop if uhrswork < 35
 drop if incwage==0
+summarize
 ********************************************************************************
 **                                   P3                                       **
 ********************************************************************************
