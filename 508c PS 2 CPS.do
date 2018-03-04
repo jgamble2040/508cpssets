@@ -104,7 +104,7 @@ graph twoway (line pointhourlywage exper)
 //Change to NLSY data and regenerate variables//
 **code**
 use nlsy79.dta, clear
-gen hourlywage=laborinc07/hours07
+gen hourlywage=ln(laborinc07/hours07)
 gen age=(age79+28)
 //Age in 2007//
 gen exper = age - educ - 5 
@@ -145,6 +145,7 @@ local childhoodcontrols foreign urban14 mag14 news14 lib14 educ_mom educ_dad num
 reg hourlywage educ exper exper2 `AFQTcontrols' `childhoodcontrols', robust
 //Estimated return with AFQT control goes down alot. This suggests that overall 
 //intelligence may have a confounding impact on both wages and education levels.
+//It's possible that your education is also mediating.
 //Childhood controls led to a smaller decrease, confirming the hypothesis that 
 //years of education may already capture the effects of childhood on wages.
 
@@ -154,4 +155,5 @@ reg hourlywage educ exper exper2 `AFQTcontrols' `childhoodcontrols', robust
 //Helpful for understanding the relationships but can change dramatically depending
 //on sample composition and controls. Causal implications are unclear as it is
 //impossible to randomize individuals entire lives.//
+//Mincerian functional form does not seem to fit the NLSY data because it isn't a full range of working adults//
 **code**
