@@ -21,7 +21,6 @@ set more off
 //comment code if it needs some explanations//
 **Generate log hourly wage variable**
 gen hourlywage = ln((incwage)/(wkswork1*uhrswork))
-//some of the incwage inputs were "0" despite there being a number of hours worked//
 **Generate race dummies**
 gen white=1 if race==100
 replace white=0 if race!=100
@@ -65,7 +64,6 @@ tab sex
 //comment//
 **code**
 reg hourlywage eduyears, robust
-//Estimated return is 2.25 percent increase in wages for a year increase in education.//
 summarize hourlywage
 summarize eduyears
 **hand calculated the correlation using forumula**
@@ -140,18 +138,8 @@ sort exper exper2
 graph twoway (line pointhourlywage exper)
 
 ********************************************************************************
-**                                   P9                                       **
-********************************************************************************
-//It is difficult to infer a causal effect from the beta as both data sets are 
-//observational. There is certainly correlation. However, without a counter
-//factual and randomize factors in the  error terms, I'm not sure if the betas
-//represent causal effects.//
-**code**
-
-********************************************************************************
 **                                   P10                                      **
 ********************************************************************************
-//Notes on paper.//
 **code**
 local extendedcontrols black hisp male
 reg hourlywage educ exper exper2 `extendedcontrols', robust
@@ -164,17 +152,3 @@ reg hourlywage educ exper exper2 `extendedcontrols' `childhoodcontrols', robust
 local AFQTcontrols black hisp male afqt81
 local childhoodcontrols foreign urban14 mag14 news14 lib14 educ_mom educ_dad numsibs
 reg hourlywage educ exper exper2 `AFQTcontrols' `childhoodcontrols', robust
-//Estimated return with AFQT control goes down alot. This suggests that overall 
-//intelligence may have a confounding impact on both wages and education levels.
-//It's possible that your education is also mediating.
-//Childhood controls led to a smaller decrease, confirming the hypothesis that 
-//years of education may already capture the effects of childhood on wages.
-
-********************************************************************************
-**                                   P11                                      **
-********************************************************************************
-//Helpful for understanding the relationships but can change dramatically depending
-//on sample composition and controls. Causal implications are unclear as it is
-//impossible to randomize individuals entire lives.//
-//Mincerian functional form does not seem to fit the NLSY data because it isn't a full range of working adults//
-**code**
