@@ -4,9 +4,10 @@
 *  Author : Joelle Gamble     *
 *  Email: jcgamble@           *
 *******************************
-//credit: Joelle Gamble, Chris Austin, Somya Baja, Luke Strathmann, Ana Ko//
+//credit: Joelle Gamble, Chris Austin, Somya Baja, Luke Strathmann, Ana Korolkova//
 
 clear all
+cd "/Users/joellegamble/Desktop/STATA"
 use cps08.dta,clear
 
 set more off
@@ -51,7 +52,10 @@ gen exper2 = (exper^2)
 replace hourlywage=. if uhrswork < 35
 drop if uhrswork < 35
 drop if incwage==0
-summarize
+summarize eduyears age exper incwage
+tab race
+tab sex
+
 ********************************************************************************
 **                                   P3                                       **
 ********************************************************************************
@@ -71,13 +75,13 @@ correlate hourlywage eduyears
 //Two different versions of the Mincerian Wage Equation.//
 **multivariate regression**
 reg hourlywage eduyears exper exper2, robust
-lincom exper+exper2
 **Series of bivariate regressions as application of Frisch-Waugh Theorem**
 reg hourlywage exper exper2, robust
 predict u_y, residual
 reg eduyears exper exper2, robust
 predict u_x, residual
 reg u_y u_x, robust
+
 ********************************************************************************
 **                                   P5                                       **
 ********************************************************************************
@@ -110,7 +114,10 @@ gen age=(age79+28)
 gen exper = age - educ - 5 
 gen exper2 = (exper^2)
 drop if hours07 < 1750
-summarize
+summarize laborinc07 educ age exper
+tab black 
+tab hisp
+tab male
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
@@ -118,6 +125,16 @@ summarize
 **code**
 local extendedcontrols black hisp male
 reg hourlywage educ exper exper2 `extendedcontrols', robust
+
+egen edubar=mean(educ)
+egen blackbar=mean(black)
+egen hispbar=mean(hisp)
+egen sexbar=mean(male)
+local extendedcontrols black hisp male
+reg hourlywage educ exper exper2 `extendedcontrols', robust
+gen pointhourlywage = _b[educ]*edubar + _b[exper]*exper + _b[exper2]*exper2 + _b[black]*blackbar + _b[hisp]*hispbar + _b[male]*sexbar + _b[_cons]
+sort exper exper2
+graph twoway (line pointhourlywage exper)
 
 ********************************************************************************
 **                                   P9                                       **
@@ -135,6 +152,7 @@ reg hourlywage educ exper exper2 `extendedcontrols', robust
 **code**
 local extendedcontrols black hisp male
 reg hourlywage educ exper exper2 `extendedcontrols', robust
+correlate afqt81 educ
 local AFQTcontrols black hisp male afqt81
 reg hourlywage educ exper exper2 `AFQTcontrols', robust
 local extendedcontrols black hisp male
