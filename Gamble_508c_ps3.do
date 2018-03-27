@@ -141,7 +141,19 @@ margins, dydx(income)
 **                                   P7                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
+logistic unhealthy income age, robust
+logistic unhealthy income age uninsured, robust 
+**income coefficient doesn't decrease. It moves up to 0.36. Uninsured is .997**
+logistic unhealthy income age alc5upyr, robust
+**income coeff moves downward to 0.34 and alc5upyr is roughly one...which is interesting**
+logistic unhealthy income age smokev, robust 
+** income 0.359 smoking 1.03**
+logistic unhealthy income age vig10fwk, robust
+**income 0.378 vig10fwk 0.85**IMPORTANT ONE**
+logistic unhealthy income age bacon, robust  
+**income 0.357 bacone 1.00....interesting that it doesn't seem to matter*
 
+ 
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
