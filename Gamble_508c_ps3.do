@@ -126,7 +126,16 @@ margins, dydx(white) at (income==0)
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
+//Are mfx on family income causal//
+logistic mort5 age income edyrs black
+mfx
+margins, dydx(income)
+**coeff is -0.021**
+logistic mort5 age income edyrs white 
+mfx
+margins, dydx(income)
+**ceoff is -0.21**
+**Since marginal effects are similar to the Beta in OLS, we can assign causality**
 
 ********************************************************************************
 **                                   P7                                       **
