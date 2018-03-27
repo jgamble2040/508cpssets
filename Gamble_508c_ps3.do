@@ -73,8 +73,36 @@ graph bar unhealthy, over(race)
 ********************************************************************************
 **                                   P4                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
-
+//LPM + PROBIT + LOGIT//
+**generate age categorical*
+gen youth=1 if age<40
+replace youth=2 if inlist(age,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,60)
+replace youth=3 if age>60
+*mortality*
+reg mort5 age income edyrs race, robust //for LPM continuous seems better//
+reg mort5 youth income edulevel race, robust //higher SEs and coeff//
+probit mort5 age income edyrs race, robust
+mfx
+probit mort5 youth income edulevel race, robust //same 
+logit mort5 age income edyrs race, robust
+mfx
+logit mort5 youth income edulevel race, robust //same
+logistic mort5 age income edyrs race, robust
+mfx
+*Choose logistic. Gives odds ratio*
+*health*
+reg unhealthy age income edyrs race, robust //for LPM continuous seems better//
+reg unhealthy youth income edulevel race, robust //higher SEs and coeff//
+probit unhealthy age income edyrs race, robust
+mfx
+probit unhealthy youth income edulevel race, robust //same 
+logit unhealthy age income edyrs race, robust
+mfx
+logit unhealthy youth income edulevel race, robust //same
+logistic unhealthy age income edyrs race, robust
+mfx
+**maybe I should look at the scatterplots to determine best fit?*
+*Marginal effects are similar across the models. Here logit and probit become nearly the same*
 ********************************************************************************
 **                                   P5                                       **
 ********************************************************************************
