@@ -83,9 +83,11 @@ reg mort5 age income edyrs race, robust //for LPM continuous seems better//
 reg mort5 youth income edulevel race, robust //higher SEs and coeff//
 probit mort5 age income edyrs race, robust
 mfx
+scatter mort5 age || fpfit mort5 age ||, by(income, edyrs, race)
 probit mort5 youth income edulevel race, robust //same 
 logit mort5 age income edyrs race, robust
 mfx
+scatter mort5 age || fpfit mort5 age
 logit mort5 youth income edulevel race, robust //same
 logistic mort5 age income edyrs race, robust
 mfx
@@ -106,8 +108,21 @@ mfx
 ********************************************************************************
 **                                   P5                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
-
+//high income Arfrican Americans v. low income Whites//
+gen highincome=1 if income==2
+replace highincome=0 if income<2
+gen lowincome=1 if income==0
+replace lowincome=0 if income>0
+logistic mort5 age income edyrs black
+mfx
+margins, dydx(black) at (income==2)
+**coeff is .008**
+logistic mort5 age income edyrs white 
+mfx
+margins, dydx(white) at (income==0)
+**coeff is -0.006**
+**No because factors other than income may be confounding the impact of income**
+**health for African Americans---neighborhood, wealth, etc**
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
