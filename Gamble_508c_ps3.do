@@ -11,7 +11,7 @@ clear all
 *Set directory, dta file, etc.
 cd "/Users/joellegamble/Desktop/STATA/ps3"
 use nhis2000.dta,clear
-
+ssc install mdesc
 set more off
 
 ********************************************************************************
@@ -21,7 +21,9 @@ set more off
 gen unhealthy=1 if health >3
 replace unhealthy=0 if health<=3
 tab unhealthy
-summarize age
+summarize
+tab mort5 sex
+tab health race
 ********************************************************************************
 **                                   P2                                       **
 ********************************************************************************
@@ -29,14 +31,12 @@ summarize age
 gen male=1 if sex==1
 replace male=0 if sex==2
 drop if mort5==.
-probit mort5 c.age##i.male, robust
-twoway fpfit mort5 age if male==1, saving(male)
-twoway fpfit mort5 age if male==0, saving(female)
-gr combine male.gph female.gph, ycommon
-probit unhealthy c.age##i.male, robust
-twoway fpfit unhealthy age if male==1, saving(male2)
-twoway fpfit unhealthy age if male==0, saving(female2)
-gr combine male2.gph female2.gph, ycommon
+graph twoway lfit mort5 age if male==1 || lfit mort5 age if male==0
+**women have lower mortality than men**
+graph twoway lfit unhealthy age if male==1 || lfit unhealthy age if male==0
+**women reported poorer health status than men at younger ages but then it switches after 60**
+----
+
 
 ********************************************************************************
 **                                   P3                                       **
@@ -153,12 +153,15 @@ logistic unhealthy income age vig10fwk, robust
 logistic unhealthy income age bacon, robust  
 **income 0.357 bacone 1.00....interesting that it doesn't seem to matter*
 
- 
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
-
+//multinomial health status//
+logistic mort5 health age income, robust
+**coeff on health is 1.62**
+logistic mort5 unhealthy age income, robust
+**coeff is 2,84 when only looking at poor health**
+scatter mort5 health || fpfit mort5 health
 ********************************************************************************
 **                                   P9                                       **
 ********************************************************************************
