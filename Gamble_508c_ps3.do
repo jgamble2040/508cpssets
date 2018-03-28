@@ -36,8 +36,6 @@ graph twoway lfit mort5 age if male==1 || lfit mort5 age if male==0
 graph twoway lfit unhealthy age if male==1 || lfit unhealthy age if male==0
 **women reported poorer health status than men at younger ages but then it switches after 60**
 ----
-
-
 ********************************************************************************
 **                                   P3                                       **
 ********************************************************************************
@@ -48,9 +46,11 @@ replace income=1 if faminc_20t75==1
 replace income=0 if faminc_gt==0 & faminc_20t75==0 
 drop if income==.
 oprobit mort5 income, robust
-graph bar mort5, over(income)
 oprobit unhealthy income, robust
-graph bar unhealthy, over(income)
+graph bar unhealthy mort5, over(income)
+**graph 3**
+**DESCRIBE***
+
 **education**
 gen edulevel=1 if edyrs<12
 replace edulevel=2 if edyrs==12
@@ -58,18 +58,21 @@ replace edulevel=3 if inlist(edyrs,13, 14, 15)
 replace edulevel=4 if edyrs==16
 replace edulevel=5 if edyrs>16
 oprobit mort5 edulevel, robust
-graph bar mort5, over(edulevel)
 oprobit unhealthy edulevel, robust
-graph bar unhealthy, over(edulevel)
+graph bar unhealthy mort5, over(edulevel)
+**graph 4**
+
 **race**
 gen race=3 if white==1
 replace race=2 if black==1
 replace race=1 if hisp==1
 replace race=0 if white==0 & black==0 & hisp==0
 mprobit mort5 race, robust
-graph bar mort5, over(race)
 mprobit unhealthy race, robust
-graph bar unhealthy, over(race)
+graph bar unhealthy mort5, over(race)
+**graph 5-population that died within 5 years**
+**mortality is highest for white people**
+**poor health is highest for black people**
 ********************************************************************************
 **                                   P4                                       **
 ********************************************************************************
