@@ -246,7 +246,7 @@ oprobit health age income edyrs black hisp, robust
        /cut3 |   .9118324   .0478302                       .818087    1.005578
        /cut4 |    1.71897   .0493357                      1.622274    1.815667
 ------------------------------------------------------------------------------
-
+**cut points are the probit coefficient cutoffs**
 mfx
   income |   .1084063      .00389   27.88   0.000   .100785  .116028   .886766
      age |  -.0056851      .00014  -40.15   0.000  -.005963 -.005408   49.0353
@@ -260,3 +260,106 @@ mfx
 **                                   P10                                      **
 ********************************************************************************
 //comment code if it needs some explanations//
+
+*Matrix Method-Black*
+gen cons=1
+oprobit health income edyrs coverage if black == 1
+su health income edyrs coverage if black == 1
+matrix vecaccum mean = cons income edyrs coverage [iw=1/_N] if black==1
+matrix list mean
+matrix b = get(_b)
+matrix list b
+matrix index = mean*b'
+display normprob(index[1,1])
+replace coverage=0 if coverage==.
+replace edyrs=0 if edyrs==.
+replace health=0 if health==.
+replace income=0 if income==.
+predict p_hat_1, outcome(1)
+predict p_hat_2, outcome(2)
+predict p_hat_3, outcome(3)
+predict p_hat_4, outcome(4)
+predict p_hat_5, outcome(5)
+
+
+*Black
+ 
+oprobit health income edyrs coverage if black == 1
+ 
+foreach var in edyrs coverage {
+  sum `var'
+  replace `var' = r(mean)
+  }
+ 
+*Generate predicted probability of health status, by income category
+*black
+ 
+predict b_hat_1xx, outcome(1)
+predict b_hat_2xx, outcome(2)
+predict b_hat_3xx, outcome(3)
+predict b_hat_4xx, outcome(4)
+predict b_hat_5xx, outcome(5)
+ 
+ 
+*graph9*
+ 
+sort income
+ 
+twoway (connect b_hat_1xx income)(connect b_hat_2xx income)(connect b_hat_3xx income) (connect b_hat_4xx income)(connect b_hat_5xx income), legend(label(1 "Excellent") ///
+                label(2 "Very good") label(3 "Good") label(4 "Fair") label(5 "Poor")) ///
+                ytitle(Predicted probability) title(Predicted probability of health status) ///
+                subtitle(black == 1)
+               
+               
+*White
+ 
+oprobit health income edyrs coverage if white == 1
+ 
+*Generate predictions by self-reported health status, setting all the other
+ 
+foreach var in edyrs coverage {
+  sum `var'
+  replace `var' = r(mean)
+  }
+ 
+*Generate predicted probability of health status, by income category
+*black
+ 
+predict b_hat_1x, outcome(1)
+predict b_hat_2x, outcome(2)
+predict b_hat_3x, outcome(3)
+predict b_hat_4x, outcome(4)
+predict b_hat_5x, outcome(5)
+ 
+ 
+ 
+*graph10
+
+sort income
+twoway (connect b_hat_1x income)(connect b_hat_2x income)(connect b_hat_3x income)  (connect b_hat_4x income)(connect b_hat_5x income),  legend(label(1 "Excellent") ///
+                label(2 "Very good") label(3 "Good") label(4 "Fair") label(5 "Poor")) ///
+                ytitle(Predicted probability) title(Predicted probability of health status) ///
+                subtitle(white == 1)
+ 
+ 
+*generate differences in predicted probability of health status between races,
+ 
+*by income category
+ 
+gen diff1 = b_hat_1x - b_hat_1xx
+gen diff2 = b_hat_2x - b_hat_2xx
+gen diff3 = b_hat_3x - b_hat_3xx
+gen diff4 = b_hat_4x - b_hat_4xx
+gen diff5 = b_hat_5x - b_hat_5xx
+               
+ 
+//How do they compare with the unadjusted histogram of self-reported health
+ 
+B/W graph11
+ 
+sort income
+ 
+twoway (connect diff1 income)(connect diff2 income)      (connect diff3 income)(connect diff4 income)(connect diff5 income), ///
+                legend(label(1 "Excellent") label(2 "Very good") label(3 "Good") ///
+                label(4 "Fair") label(5 "Poor")) ytitle(Predicted Probability Differences) ///
+                title(Differences in predicted health status) subtitle(between whites and blacks)
