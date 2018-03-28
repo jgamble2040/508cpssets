@@ -188,8 +188,8 @@ margins, dydx(income)
 gen coverage=1 if uninsured==2
 replace coverage=0 if uninsured==1
 logistic unhealthy income age, robust
-logistic unhealthy income age coverage, robust 
-**income coefficient doesn't decrease. It moves up to 0.36. Uninsured is .977**
+logistic unhealthy c.income##c.coverage age, robust
+**income coeff is .59 interacted term is .56**
 logistic unhealthy income age alc5upyr, robust
 **income coeff moves downward to 0.34 and alc5upyr is roughly one...which is interesting**
 logistic unhealthy income age smokev, robust 
@@ -203,15 +203,50 @@ logistic unhealthy income age bacon, robust
 **                                   P8                                       **
 ********************************************************************************
 //multinomial health status//
-logistic mort5 health age income, robust
-**coeff on health is 1.62**
-logistic mort5 unhealthy age income, robust
-**coeff is 2,84 when only looking at poor health**
-scatter mort5 health || fpfit mort5 health
+oprobit mort5 health age income, robust
+**coeff on health is .251**
+probit mort5 unhealthy age income, robust
+**coeff is .57 when only looking at poor health**
+
+oprobit mort5 health age income, robust
+foreach var in age income {
+  sum `var'
+replace `var'_mean2 = r(mean)	
+  }
+predict p_hat_0, outcome(0)
+predict p_hat_1, outcome(1)
+
+sort health
+twoway (connect p_hat_1 health),
+       legend(label(1 "Died within 5 yrs")) ytitle(Predicted mortality probability)
+	   title(Predicted probability of dying within 5 years)
+ **monotonic**
 ********************************************************************************
 **                                   P9                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
+oprobit health income age edulevel race, robust
+             |               Robust
+      health |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      income |  -.3376265   .0119369   -28.28   0.000    -.3610224   -.3142307
+         age |   .0177249   .0004315    41.08   0.000     .0168792    .0185706
+    edulevel |  -.1921867   .0072313   -26.58   0.000    -.2063599   -.1780135
+        race |  -.0431344   .0079831    -5.40   0.000    -.0587809   -.0274879
+-------------+----------------------------------------------------------------
+       /cut1 |  -.7598205   .0337662                     -.8260011     -.69364
+       /cut2 |   .1559728   .0333829                      .0905436     .221402
+       /cut3 |   1.095013   .0338051                      1.028756     1.16127
+       /cut4 |   1.903447   .0357187                       1.83344    1.973455
+
+mfx
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+  income |   .1090759      .00386   28.26   0.000   .101511  .116641   .885764
+     age |  -.0057263      .00014  -40.92   0.000  -.006001 -.005452   49.0666
+edulevel |   .0620891      .00233   26.63   0.000   .057519  .066659   2.99656
+    race |   .0139353      .00258    5.41   0.000   .008884  .018987   2.43458
+------------------------------------------------------------------------------
 
 ********************************************************************************
 **                                   P10                                      **
