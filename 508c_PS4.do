@@ -34,11 +34,19 @@ tab head_start hispanic, row
 tab sibdiff
 di 932/4041
 
-
 ********************************************************************************
 **                                   P2                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
+//When do we use sibdiff?//
+xtset mom_id
+xtreg comp_score_5to6 head_start, i(mom_id) re
+local controlspoverty lninc_0to3 lnbw
+xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) re
+local controlsfamily black hispanic momed dadhome_0to3
+xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) re
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily black hispanic momed dadhome_0to3
+xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) re
 
 ********************************************************************************
 **                                   P3                                       **
