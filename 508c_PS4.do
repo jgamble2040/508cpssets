@@ -202,4 +202,33 @@ xtreg fphealth i.head_start##i.male, i(mom_id) fe
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
+//Certain demographics are more likely to do poorly on scores than others.//
+//Let's use race as an example.
+local controlsparents momed dadhome_0to3
+local controlspoverty lninc_0to3 lnbw
+reg comp_score_5to6 black `controlsparents' `controlspoverty', robust
+// coeff is -2.78. Thus, being Black represents a disadvantage for students on exams.
+//Even controlling for income, parental details and birth weight.
+
+**primary fixed effects model**
+xtset mom_id
+xtreg comp_score_5to6 head_start, i(mom_id) fe
+//head start has a significant positive effect on scores. It seems to partially 
+//mitigate the negative impact of race and income. This coeff works for Black children too.
+//This is especially important given that a larger than average proportion of Blacks are
+//in HS.
+correlate comp_score_5to6 comp_score_7to_10
+// coefficient is 0.6199. So, the score you get at age 5/6 is correlated with future
+// scores. Even though headstarts impact on later scores is smaller, impacting the 5/6 score
+// will likely have positivie effects down the road.
+correlate comp_score_5to6 comp_score_11to14
+//coefficient is 0.5375. So, similar takeaway as above.
+
+//However scores are not everything. The positive & significant relationship
+//between H_S and high school graduation is also important.
+xtreg hsgrad head_start, i(mom_id) fe
+**coeff is 0.148 is the increase in the probability of graduating high school. 
+logistic hsgrad head_start, robust
+**For clarity I found the log of the odds. The coeff on HS is 1.028. So, HS participants
+// have a 2.8 percent higher odds of graduating HS.
+//Based on these results, I would recommend expanding the program.
