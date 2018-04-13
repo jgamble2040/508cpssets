@@ -40,19 +40,24 @@ di 932/4041
 //When do we use sibdiff?//
 xtset mom_id
 xtreg comp_score_5to6 head_start, i(mom_id) re
+**Coeff -2.53
 
 **poverty controls**
 local controlspoverty lninc_0to3 lnbw
 xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) re
+**coeff is -.65
 
 **family level controls**
 local controlsfamily black hispanic momed dadhome_0to3
 xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) re
+**coeff -.77
 
 **all controls**
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily black hispanic momed dadhome_0to3
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) re
+**-.29 is coeff. It's not statistically significant
+
 //HS is not exogenenous as it is correlated with factors in the error term.
 ********************************************************************************
 **                                   P3                                       **
@@ -61,59 +66,56 @@ xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) r
 xtset mom_id
 **no controls**
 xtreg comp_score_5to6 head_start, i(mom_id) fe
-//coefficient is 7.3. Standard error is higher than random effect.//
+//coefficient is 7.38. Standard error is higher than random effect.//
 
 //I could not use post-treatment controls because they capture the effect of being in
 // Head Start and mediate the impact of HS on the dependent variable.
 
 **poverty controls**
 local controlspoverty lninc_0to3 lnbw
-xtreg comp_score_5to6 head_start `controls poverty', i(mom_id) fe
-//controls had no effect on coefficient as these controls are perfectly collinear
-//with the entity level fixed effect and fixed effects drops the gamma 
-//that accounts for within entity variation like log birth weight
+xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) fe
+** coeff is 6.9
+//controls that had no effect on coefficient are perfectly collinear. Other controls
+//reduced size of coefficient.
 
 **family level controls**
 local controlsfamily black hispanic momed dadhome_0to3
-xtreg comp_score_5to6 head_start `controls family', i(mom_id) fe
-//same as above//
+xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) fe
+**coeff is 6.5
+
 
 **all controls**
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily black hispanic momed dadhome_0to3
-xtreg comp_score_5to6 head_start `controls poverty' `controls family', i(mom_id) fe
-//same as above//
+xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coeff is 5.7
 
 //Fixed effects seems to capture more of the causal effect of head start on test
 //scores. This is because Head Start eligibility is conditional on family level attributes.
 //There are items in the error term that are correlated across entities, attenuating 
-//the coefficient in the random effect.  Thus, we need to use fixed
-//effects to account for that variation and get a truer estimate of head start's effects.
+//the coefficient in the random effect and the fixed effect.  Thus, we need to use fixed
+//effects with controls to account for that variation and get a truer estimate of head start's effects.
 
 ********************************************************************************
 **                                   P4                                       **
 ********************************************************************************
 //Fixed effects is causal if:
 //--there is no OVB that is not captured by fixed effect. So, no variable in
-//error that is correlated with head start and test scores and varies over time.\\\\\\\\\\\\\\\\\\\
+//error that is correlated with head start and test scores.\\
 //--In order to achieve this, there must be no observation level variation that is
 //correlated with the error term that is not captured by the demeaning process used
 //to estimate the fixed effect.
 **Possible OVBs**
-**sibdiff**
-reg comp_score_5to6 head_start, robust
-reg comp_score_5to6 head_start sibdiff, robust
-//sibdiff in this regression had a more negative impact on scores than headstart at large.
-//but it was not a significant.
-xtreg comp_score_5to6 head_start sibdiff, i(mom_id) fe
-xtreg comp_score_5to6 sibdiff, i(mom_id) fe
-//Sibdiff ommitted due to multicollinearity. It seems like it is not an OV.
-**ppvt_3**
-xtreg comp_score_5to6 head_start ppvt_3, i(mom_id) fe
-//coefficient became negative but not significant.
 
-//Because controlling for other possible OVBs produced statistically insig. results
-// or collinearity, one can conclude that the coefficient in FE is causal.
+//To test if these is OVB, I use the obs-level sign. variables that I do have. If these are correlated,
+//there are probably unobserved variables that also are correlated.
+
+**Regression + F-test for joint significance**
+reg head_start lnbw ppvt_3 firstborn male, robust
+test lnbw ppvt_3 male firstborn
+**All are signficant from zero
+//There are observed correlated variables with HS. So, there are probably also unobserved.
+
 
 ********************************************************************************
 **                                   P5                                       **
