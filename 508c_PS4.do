@@ -111,6 +111,8 @@ xtreg comp_score_5to6 sibdiff, i(mom_id) fe
 xtreg comp_score_5to6 head_start ppvt_3, i(mom_id) fe
 //coefficient became negative but not significant.
 
+//Because controlling for other possible OVBs produced statistically insig. results
+// or collinearity, one can conclude that the coefficient is causal.
 
 ********************************************************************************
 **                                   P5                                       **
@@ -132,12 +134,32 @@ xtreg comp_score_11to14 head_start, i(mom_id) fe
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
+//Effects on other outcomes//
+**Repeating a grade
+xtreg repeat head_start, i(mom_id) fe
+
+**Learning disability
+
+**Graduating High School
+
+**Some college
+
+**Health
+
+**Idleness
 
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
-//comment code if it needs some explanations//
+//regression with race interaction//
+
+
+//Race graphs
+
+
+//regression with sex interaction
+
+//Gender graphs
 
 ********************************************************************************
 **                                   P8                                       **
