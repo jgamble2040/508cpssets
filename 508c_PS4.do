@@ -85,9 +85,9 @@ xtreg comp_score_5to6 head_start `controls poverty' `controls family', i(mom_id)
 //same as above//
 
 //Fixed effects seems to capture more of the causal effect of head start on test
-//scores. This is because there are items in the error term that are correlated 
-//across entities, attenuating the coefficient in the random effect. Head Start
-//eligibility is conditional on family level attributes. Thus, we need to use fixed
+//scores. This is because Head Start eligibility is conditional on family level attributes.
+//There are items in the error term that are correlated across entities, attenuating 
+//the coefficient in the random effect.  Thus, we need to use fixed
 //effects to account for that variation and get a truer estimate of head start's effects.
 
 ********************************************************************************
@@ -113,7 +113,7 @@ xtreg comp_score_5to6 head_start ppvt_3, i(mom_id) fe
 //coefficient became negative but not significant.
 
 //Because controlling for other possible OVBs produced statistically insig. results
-// or collinearity, one can conclude that the coefficient is causal.
+// or collinearity, one can conclude that the coefficient in FE is causal.
 
 ********************************************************************************
 **                                   P5                                       **
