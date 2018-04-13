@@ -53,7 +53,7 @@ xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) re
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily black hispanic momed dadhome_0to3
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) re
-
+//HS is not exogenenous as it is correlated with factors in the error term.
 ********************************************************************************
 **                                   P3                                       **
 ********************************************************************************
