@@ -123,46 +123,64 @@ test lnbw ppvt_3 male firstborn
 //Headstart effect at different ages.//
 //Test scores are over different age periods. So, we should weight them?
 //5-6
-xtreg comp_score_5to6 head_start, i(mom_id) fe
-** coef 7.31
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+** coef 5.72
 
 //7-10
-xtreg comp_score_7to10 head_start, i(mom_id) fe
-**coef 3.78
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg comp_score_7to10 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coef 3.826
 
 //11-14
-xtreg comp_score_11to14 head_start, i(mom_id) fe
-**coef 3.94
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg comp_score_11to14 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coef 5.79
 
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
 //Effects on other outcomes//
 **Repeating a grade
-xtreg repeat head_start, i(mom_id) fe
-**coef -0.06. P-value 0.048....barely significant at the 5 % level.
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg repeat head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coef -0.0645. P-value 0.194
 
 **Learning disability
-xtreg learndis head_start, i(mom_id) fe
-**coef -0.029 p-value is 0.027
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg learndis head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coef -0.021 p-value is 0.327
 
 **Graduating High School
-xtreg hsgrad head_start, i(mom_id) fe
-** coef 0.147 p-value 0.00
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg hsgrad head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+** coef 0.15 p-value 0.007
 
 **Some college
-xtreg somecoll head_start, i(mom_id) fe
-** 0.096 p-value 0.004
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg somecoll head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+** 0.031 p-value 0.558
 
 **Health
-xtreg fphealth head_start, i(mom_id) fe
-**coef -0.07 p-value 0.003. Note: Should be interpreted as head start reducing poor health
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg fphealth head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+**coef -0.092 p-value 0.018. Note: Should be interpreted as head start reducing poor health
 
 **Idleness
-xtreg idle head_start, i(mom_id) fe
-** coef -0.068 p-value 0.016
+local controlspoverty lninc_0to3 lnbw
+local controlsfamily dadhome_0to3
+xtreg idle head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+** coef -0.047 p-value 0.295
 
-//Effects on later outcomes are small but mostly significant.
+//Effects on later outcomes are small and many are not significant.
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
@@ -214,8 +232,10 @@ reg comp_score_5to6 black `controlsparents' `controlspoverty', robust
 
 **primary fixed effects model**
 xtset mom_id
-xtreg comp_score_5to6 head_start, i(mom_id) fe
-//head start has a significant positive effect on scores. It seems to partially 
+local controlsparents momed dadhome_0to3
+local controlspoverty lninc_0to3 lnbw
+xtreg comp_score_5to6 head_start `controlsparents' `controlspoverty', i(mom_id) fe
+//Coeff 5.72 head start has a significant positive effect on scores. It seems to partially 
 //mitigate the negative impact of race and income. This coeff works for Black children too.
 //This is especially important given that a larger than average proportion of Blacks are
 //in HS.
@@ -228,9 +248,13 @@ correlate comp_score_5to6 comp_score_11to14
 
 //However scores are not everything. The positive & significant relationship
 //between H_S and high school graduation is also important.
-xtreg hsgrad head_start, i(mom_id) fe
-**coeff is 0.148 is the increase in the probability of graduating high school. 
-logistic hsgrad head_start, robust
-**For clarity I found the log of the odds. The coeff on HS is 1.028. So, HS participants
-// have a 2.8 percent higher odds of graduating HS.
+local controlsparents momed dadhome_0to3
+local controlspoverty lninc_0to3 lnbw
+xtreg hsgrad head_start `controlsparents' `controlspoverty', i(mom_id) fe
+**coeff is 0.151 is the increase in the probability of graduating high school. 
+local controlsparents momed dadhome_0to3
+local controlspoverty lninc_0to3 lnbw
+logistic hsgrad head_start `controlsparents' `controlspoverty', robust
+**For clarity I found the log of the odds. The coeff on HS is 1.127. So, HS participants
+// have a 12.7 percent higher odds of graduating HS.
 //Based on these results, I would recommend expanding the program.
