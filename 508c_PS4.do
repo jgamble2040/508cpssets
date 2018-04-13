@@ -20,6 +20,7 @@ mdesc
 **Choose to drop missing values in income and mother's years of education**
 drop if momed==.
 drop if lninc_0to3==.
+drop if learndis==.
 **Dropping other values represents to large of a portion of the data set.**
 ********************************************************************************
 **                                   P1                                       **
@@ -137,17 +138,29 @@ xtreg comp_score_11to14 head_start, i(mom_id) fe
 //Effects on other outcomes//
 **Repeating a grade
 xtreg repeat head_start, i(mom_id) fe
+**coef -0.06. P-value 0.048....barely significant at the 5 % level.
 
 **Learning disability
+xtreg learndis head_start, i(mom_id) fe
+**coef -0.029 p-value is 0.027
 
 **Graduating High School
+xtreg hsgrad head_start, i(mom_id) fe
+** coef 0.147 p-value 0.00
 
 **Some college
+xtreg somecoll head_start, i(mom_id) fe
+** 0.096 p-value 0.004
 
 **Health
+xtreg fphealth head_start, i(mom_id) fe
+**coef -0.07 p-value 0.003. Note: Should be interpreted as head start reducing poor health
 
 **Idleness
+xtreg idle head_start, i(mom_id) fe
+** coef -0.068 p-value 0.016
 
+//Effects on later outcomes are small but mostly significant.
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
