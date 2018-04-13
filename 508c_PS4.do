@@ -164,15 +164,40 @@ xtreg idle head_start, i(mom_id) fe
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
-//regression with race interaction//
+//regressions with race interaction//
+xtreg hsgrad i.head_start##i.black, i(mom_id) fe
+**Beta 3 is 0.07 indicating that being Black and in head start increases probability of
+**finishing High School
+xtreg repeat i.head_start##i.black, i(mom_id) fe
+**Being Black may reduce the impact HS has on repeating a grade. B1 is -0.7 B3 is 0.008.
+**Neither are statistically significant though.
+xtreg learndis i.head_start##i.black, i(mom_id) fe
+**Not statistically sig.
+xtreg somecoll i.head_start##i.black, i(mom_id) fe
+** B3 is 0.14. It's significant. But, B1 in this regression is not.
+xtreg idle i.head_start##i.black, i(mom_id) fe
+**None are statistically significant.
+xtreg fphealth i.head_start##i.black, i(mom_id) fe
+**B3 is not sig. B1 (-0.106) is sig.
 
+//regressions with sex interaction //
+xtreg hsgrad i.head_start##i.male, i(mom_id) fe
+**Beta 3 is 0.037 but p value is 0.412. So, it's not statistically significant
+xtreg repeat i.head_start##i.male, i(mom_id) fe
+**Not significant
+xtreg learndis i.head_start##i.male, i(mom_id) fe
+**Not significant
+xtreg somecoll i.head_start##i.male, i(mom_id) fe
+**B1 is significant but not interaction term.
+xtreg idle i.head_start##i.male, i(mom_id) fe
+**Not significant
+xtreg fphealth i.head_start##i.male, i(mom_id) fe
+**Not significant
 
-//Race graphs
+//Only the regressions looking at race and gender on high school graduation was significant
+//This could be that the effects on other outcomes are insignificant.
+//It could also mean that we'd need more statistical power to estimate the DID.
 
-
-//regression with sex interaction
-
-//Gender graphs
 
 ********************************************************************************
 **                                   P8                                       **
