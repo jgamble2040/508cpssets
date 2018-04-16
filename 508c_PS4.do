@@ -34,31 +34,33 @@ tab head_start hispanic, row
 tab sibdiff
 di 932/4041
 
+//Consider a bar graph or two.
 ********************************************************************************
 **                                   P2                                       **
 ********************************************************************************
 //When do we use sibdiff?//
 xtset mom_id
 xtreg comp_score_5to6 head_start, i(mom_id) re
-**Coeff -2.53
+**Coeff -2.53 significant
 
 **poverty controls**
 local controlspoverty lninc_0to3 lnbw
 xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) re
-**coeff is -.65
+**coeff is -.65 not significant
 
 **family level controls**
-local controlsfamily black hispanic momed dadhome_0to3
+local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) re
-**coeff -.77
+**coeff -.61 not sig
 
 **all controls**
 local controlspoverty lninc_0to3 lnbw
-local controlsfamily black hispanic momed dadhome_0to3
+local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) re
-**-.29 is coeff. It's not statistically significant
+**-.13 is coeff. It's not statistically significant
 
-//HS is not exogenenous as it is correlated with factors in the error term.
+//HS is not exogenenous as it is correlated with factors in the error term. 
+// These coefficients are not significant when controls are added.
 ********************************************************************************
 **                                   P3                                       **
 ********************************************************************************
@@ -79,14 +81,14 @@ xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) fe
 //reduced size of coefficient.
 
 **family level controls**
-local controlsfamily black hispanic momed dadhome_0to3
+local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) fe
 **coeff is 6.5
 
 
 **all controls**
 local controlspoverty lninc_0to3 lnbw
-local controlsfamily black hispanic momed dadhome_0to3
+local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
 **coeff is 5.7
 
@@ -124,21 +126,31 @@ test lnbw ppvt_3 male firstborn
 //Test scores are over different age periods. So, we should weight them?
 //5-6
 local controlspoverty lninc_0to3 lnbw
-local controlsfamily dadhome_0to3
+local controlsfamily dadhome_0to3 
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
-** coef 5.72
+** coef 5.72 
+sum comp_score_5to6
+//To standardize, divide 5.72/22.3
+di 5.72/22.3
+** 26 percent STD improvement
 
 //7-10
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg comp_score_7to10 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
 **coef 3.826
+sum comp_score_7to10
+di 3.82/24.1
+** 15 percent STD improvement
 
 //11-14
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg comp_score_11to14 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
 **coef 5.79
+sum comp_score_11to14
+di 5.79/24.8
+**23.3 percent STD improvement
 
 ********************************************************************************
 **                                   P6                                       **
@@ -235,7 +247,8 @@ xtset mom_id
 local controlsparents momed dadhome_0to3
 local controlspoverty lninc_0to3 lnbw
 xtreg comp_score_5to6 head_start `controlsparents' `controlspoverty', i(mom_id) fe
-//Coeff 5.72 head start has a significant positive effect on scores. It seems to partially 
+//Coeff 5.72 head start has a significant positive effect on scores. HS has
+// 26 percent STD improvementIt seems to partially 
 //mitigate the negative impact of race and income. This coeff works for Black children too.
 //This is especially important given that a larger than average proportion of Blacks are
 //in HS.
@@ -244,7 +257,7 @@ correlate comp_score_5to6 comp_score_7to_10
 // scores. Even though headstarts impact on later scores is smaller, impacting the 5/6 score
 // will likely have positivie effects down the road.
 correlate comp_score_5to6 comp_score_11to14
-//coefficient is 0.5375. So, similar takeaway as above.
+//correlation coefficient is 0.5375. So, similar takeaway as above.
 
 //However scores are not everything. The positive & significant relationship
 //between H_S and high school graduation is also important.
