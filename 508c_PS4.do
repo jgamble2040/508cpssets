@@ -34,6 +34,8 @@ tab head_start hispanic, row
 tab sibdiff
 di 932/4041
 
+
+
 //Consider a bar graph or two.
 ********************************************************************************
 **                                   P2                                       **
@@ -117,6 +119,8 @@ reg head_start lnbw ppvt_3 firstborn male, robust
 test lnbw ppvt_3 male firstborn
 **All are signficant from zero
 //There are observed correlated variables with HS. So, there are probably also unobserved.
+//However, I think we are able to control for enough individual level variables that
+//the following results are still useful to policy makers.
 
 
 ********************************************************************************
@@ -138,10 +142,10 @@ di 5.72/22.3
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg comp_score_7to10 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
-**coef 3.826
+**coef 3.826 but not sig
 sum comp_score_7to10
 di 3.82/24.1
-** 15 percent STD improvement
+** 15 percent STD improvement BUT not significant.
 
 //11-14
 local controlspoverty lninc_0to3 lnbw
@@ -228,6 +232,8 @@ xtreg fphealth i.head_start##i.male, i(mom_id) fe
 
 //Only the regressions looking at race and gender on high school graduation was significant
 //This could be that the effects on other outcomes are insignificant.
+//In conclusion, HS doesn't have a different impact by race or gender. But, if HS
+// matters and many people of color are in it, one may still care about the program.
 //It could also mean that we'd need more statistical power to estimate the DID.
 
 
@@ -270,4 +276,5 @@ local controlspoverty lninc_0to3 lnbw
 logistic hsgrad head_start `controlsparents' `controlspoverty', robust
 **For clarity I found the log of the odds. The coeff on HS is 1.127. So, HS participants
 // have a 12.7 percent higher odds of graduating HS.
-//Based on these results, I would recommend expanding the program.
+////Important note: There were many missing values, calling into quetion the data set.
+//If further study with a better data set, I would recommend expanding the program.
