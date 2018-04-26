@@ -18,7 +18,14 @@ set more off
 **                                   P1                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
-
+sum birthyr crimerate conscripted property murder drug
+tabstat birthyr crimerate conscripted property murder drug
+foreach var of varlist crimerate conscripted {
+	graph bar `var', over(birthyr)
+}
+graph bar arms, over(birthyr)
+//Crime rates raee rougly the same for all birth years. The year 1958 has a 
+//slightly higher conscription rate.
 ********************************************************************************
 **                                   P2                                       **
 ********************************************************************************
