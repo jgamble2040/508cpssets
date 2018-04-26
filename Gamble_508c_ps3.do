@@ -15,24 +15,52 @@ ssc install mdesc
 set more off
 ssc install outreg2
 
+**Generate variables**
+*poor health*
+gen unhealthy=1 if health >3
+replace unhealthy=0 if health<=3
+*gender recode*
+gen male=1 if sex==1
+replace male=0 if sex==2
+drop if mort5==.
+**income recode**
+gen income=2 if faminc_gt75==1
+replace income=1 if faminc_20t75==1
+replace income=0 if faminc_gt==0 & faminc_20t75==0 
+drop if income==.
+*education categorical*
+gen edulevel=1 if edyrs<12
+replace edulevel=2 if edyrs==12
+replace edulevel=3 if inlist(edyrs,13, 14, 15)
+replace edulevel=4 if edyrs==16
+replace edulevel=5 if edyrs>16
+**race**
+gen race=3 if white==1
+replace race=2 if black==1
+replace race=1 if hisp==1
+replace race=0 if white==0 & black==0 & hisp==0
+**age categorical**
+gen youth=1 if age<40
+replace youth=2 if inlist(age,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,60)
+replace youth=3 if age>60
+**insurance recode**
+gen coverage=1 if uninsured==2
+replace coverage=0 if uninsured==1
 ********************************************************************************
 **                                   P1                                       **
 ********************************************************************************
 //Generate binary variable and summarize//
-gen unhealthy=1 if health >3
-replace unhealthy=0 if health<=3
-tab unhealthy
-summarize
-tab mort5 sex
 tab health race
+graph bar health mort5, over(race, relabel(1 "Other" 2 "Hispanic" 3 "Black" 4 "White"))
+tab health male
+graph bar health mort5, over(male, relabel(1 "Female" 2 "Male"))
+tab health income
+graph bar health mort5, over(income, relabel(1 " less than $20k" 2 "$20k to $75k" 3 "More than $75k"))
 ********************************************************************************
 **                                   P2                                       **
 ********************************************************************************
 //Mortality and Health Status with age//
-gen male=1 if sex==1
-replace male=0 if sex==2
-drop if mort5==.
-graph twoway lfit mort5 age if male==1 || lfit mort5 age if male==0
+graph twoway lfit mort5 age if male==1 || lfit mort5 age if male==0 
 **women have lower mortality than men**
 graph twoway lfit unhealthy age if male==1 || lfit unhealthy age if male==0
 **women reported poorer health status than men at younger ages but then it switches after 60**
@@ -42,35 +70,22 @@ graph twoway lfit unhealthy age if male==1 || lfit unhealthy age if male==0
 ********************************************************************************
 //Socioeconomic status and health//
 **income**
-gen income=2 if faminc_gt75==1
-replace income=1 if faminc_20t75==1
-replace income=0 if faminc_gt==0 & faminc_20t75==0 
-drop if income==.
 oprobit mort5 income, robust
 oprobit unhealthy income, robust
-graph bar unhealthy mort5, over(income)
+graph bar unhealthy mort5, over(income, relabel (1 " less than $20k" 2 "$20k to $75k" 3 "More than $75k"))
 **graph 3**
 **DESCRIBE***
 
 **education**
-gen edulevel=1 if edyrs<12
-replace edulevel=2 if edyrs==12
-replace edulevel=3 if inlist(edyrs,13, 14, 15)
-replace edulevel=4 if edyrs==16
-replace edulevel=5 if edyrs>16
 oprobit mort5 edulevel, robust
 oprobit unhealthy edulevel, robust
-graph bar unhealthy mort5, over(edulevel)
+graph bar unhealthy mort5, over(edulevel, relabel (1 "<High School" 2 "High School" 3 "Some College" 4 "Bachelors" 5 "Graduate Stuides"))
 **graph 4**
 
 **race**
-gen race=3 if white==1
-replace race=2 if black==1
-replace race=1 if hisp==1
-replace race=0 if white==0 & black==0 & hisp==0
 mprobit mort5 race, robust
 mprobit unhealthy race, robust
-graph bar unhealthy mort5, over(race)
+graph bar unhealthy mort5, over(race, relabel(1 "Other" 2 "Hispanic" 3 "Black" 4 "White"))
 **graph 5-population that died within 5 years**
 **mortality is highest for white people**
 **poor health is highest for black people**
@@ -78,23 +93,19 @@ graph bar unhealthy mort5, over(race)
 **                                   P4                                       **
 ********************************************************************************
 //LPM + PROBIT + LOGIT//
-**generate age categorical*
-gen youth=1 if age<40
-replace youth=2 if inlist(age,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,60)
-replace youth=3 if age>60
 *mortality*
-reg mort5 age income edyrs race, robust //for LPM continuous seems better//
-reg mort5 age income edulevel race, robust // higher R-squared higher SE// *prefer*
+reg mort5 income age edyrs race, robust //for LPM continuous seems better//
+reg mort5 income age edulevel race, robust // higher R-squared higher SE// *prefer*
 predict p_ols
 label var p_ols "OLS"
 outreg2 using mortality.xls, replace ctitle (MORTALITY_LPM)
 reg mort5 youth income edulevel race, robust //higher SEs and coeff//
-probit mort5 age income edulevel race, robust
+probit mort5 income age edulevel race, robust
 mfx
 predict p_probit
 label var p_probit "Probit"
-outreg2 using mortality.xls, append ctitle (MORTALITY_PROBIT)
-logistic mort5 age income edulevel race, robust
+outreg2 using mortality.xls, ctitle (MORTALITY_PROBIT)
+logistic mort5 income age edulevel race, robust
 mfx
 predict p_logistic
 label var p_logistic "Logistic"
@@ -126,7 +137,8 @@ edulevel |  -.0393384      .00205  -19.22   0.000  -.043349 -.035328   2.99645
 ------------------------------------------------------------------------------
 predict p_probit
 label var p_probit "Probit"
-logistic unhealthy age income edulevel race, robust
+outreg2 using mortality.xls, ctitle (HEALTH_PROBIT)
+logistic unhealthy income age edulevel race, robust
 mfx
 predict p_logistic
 label var p_logistic "Logistic"
@@ -144,12 +156,7 @@ twoway scatter unhealthy age||line p_ols age||line p_probit age||line p_logistic
 **                                   P5                                       **
 ********************************************************************************
 //high income Arfrican Americans v. low income Whites//
-gen highincome=1 if income==2
-replace highincome=0 if income<2
-gen lowincome=1 if income==0
-replace lowincome=0 if income>0
-logistic mort5 age income edulevel black
-**coeff is 1.22**
+
 probit mort5 age income edulevel black
 foreach var in age income edulevel black {
 	su `var'
@@ -157,6 +164,8 @@ gen `var'_mean = r(mean)
 }
 di normprob(_b[age]*age_mean + _b[edulevel]*edulevel_mean + _b[income]*income_mean +_b[black]*black_mean + _b[_cons])
 **coeff is .036**
+logistic mort5 age income edulevel black
+**coeff is 1.22**
 mfx
 margins, dydx(black) at (income==2)
 **coeff is .0092**
@@ -193,11 +202,9 @@ margins, dydx(income)
 **                                   P7                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
-gen coverage=1 if uninsured==2
-replace coverage=0 if uninsured==1
 logistic unhealthy income age, robust
 logistic unhealthy c.income##c.coverage age, robust
-**income coeff is .59 interacted term is .56**
+**income coeff is .59 coverage is .359 and interacted term is .56**
 logistic unhealthy income age alc5upyr, robust
 **income coeff moves downward to 0.34 and alc5upyr is roughly one...which is interesting**
 logistic unhealthy income age smokev, robust 
@@ -211,6 +218,8 @@ logistic unhealthy income age bacon, robust
 **                                   P8                                       **
 ********************************************************************************
 //multinomial health status//
+gen age_mean2=age
+gen income_mean2=income
 oprobit mort5 health age income, robust
 **coeff on health is .251**
 probit mort5 unhealthy age income, robust
@@ -234,7 +243,7 @@ twoway (connect p_hat_1 health),
 ********************************************************************************
 //comment code if it needs some explanations//
 
-oprobit health age income edyrs black hisp, robust
+oprobit health income age edyrs black hisp, robust
      income  |  -.3352524   .0120085   -27.92   0.000    -.3587887   -.3117161
          age |   .0175814   .0004359    40.33   0.000      .016727    .0184357
        edyrs |  -.0661447   .0027425   -24.12   0.000      -.07152   -.0607695

@@ -34,7 +34,8 @@ tab head_start hispanic, row
 tab sibdiff
 di 932/4041
 
-
+//Upfront, this data has serious flaws. Major missing values for critical variables
+//means there may not be enough statistical power to do much.
 
 //Consider a bar graph or two.
 ********************************************************************************
@@ -43,22 +44,26 @@ di 932/4041
 //When do we use sibdiff?//
 xtset mom_id
 xtreg comp_score_5to6 head_start, i(mom_id) re
+outreg2 using Random.doc, replace ctitle (Model 1)
 **Coeff -2.53 significant
 
 **poverty controls**
 local controlspoverty lninc_0to3 lnbw
 xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) re
+outreg2 using Random.doc, append ctitle (Model 2)
 **coeff is -.65 not significant
 
 **family level controls**
 local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) re
+outreg2 using Random.doc, append ctitle (Model 3)
 **coeff -.61 not sig
 
 **all controls**
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) re
+outreg2 using Random.doc, append ctitle (Model 4)
 **-.13 is coeff. It's not statistically significant
 
 //HS is not exogenenous as it is correlated with factors in the error term. 
@@ -70,6 +75,7 @@ xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) r
 xtset mom_id
 **no controls**
 xtreg comp_score_5to6 head_start, i(mom_id) fe
+outreg2 using FE.doc, replace ctitle (Model 1)
 //coefficient is 7.38. Standard error is higher than random effect.//
 
 //I could not use post-treatment controls because they capture the effect of being in
@@ -78,6 +84,7 @@ xtreg comp_score_5to6 head_start, i(mom_id) fe
 **poverty controls**
 local controlspoverty lninc_0to3 lnbw
 xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) fe
+outreg2 using FE.doc, append ctitle (Model 2)
 ** coeff is 6.9
 //controls that had no effect on coefficient are perfectly collinear. Other controls
 //reduced size of coefficient.
@@ -85,6 +92,7 @@ xtreg comp_score_5to6 head_start `controlspoverty', i(mom_id) fe
 **family level controls**
 local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) fe
+outreg2 using FE.doc, append ctitle (Model 3)
 **coeff is 6.5
 
 
@@ -92,6 +100,7 @@ xtreg comp_score_5to6 head_start `controlsfamily', i(mom_id) fe
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily black hispanic momed dadhome_0to3 male
 xtreg comp_score_5to6 head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using FE.doc, append ctitle (Model 4)
 **coeff is 5.7
 
 //Fixed effects seems to capture more of the causal effect of head start on test
@@ -164,36 +173,42 @@ di 5.79/24.8
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg repeat head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, replace ctitle (Repeat)
 **coef -0.0645. P-value 0.194
 
 **Learning disability
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg learndis head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, append ctitle (Disability)
 **coef -0.021 p-value is 0.327
 
 **Graduating High School
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg hsgrad head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, append ctitle (HS Grad)
 ** coef 0.15 p-value 0.007
 
 **Some college
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg somecoll head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, append ctitle (Some College)
 ** 0.031 p-value 0.558
 
 **Health
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg fphealth head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, append ctitle (Health)
 **coef -0.092 p-value 0.018. Note: Should be interpreted as head start reducing poor health
 
 **Idleness
 local controlspoverty lninc_0to3 lnbw
 local controlsfamily dadhome_0to3
 xtreg idle head_start `controlspoverty' `controlsfamily', i(mom_id) fe
+outreg2 using later.doc, append ctitle (Idle)
 ** coef -0.047 p-value 0.295
 
 //Effects on later outcomes are small and many are not significant.
@@ -274,6 +289,7 @@ xtreg hsgrad head_start `controlsparents' `controlspoverty', i(mom_id) fe
 local controlsparents momed dadhome_0to3
 local controlspoverty lninc_0to3 lnbw
 logistic hsgrad head_start `controlsparents' `controlspoverty', robust
+outreg2 using log.doc, replace ctitle (HS Grad)
 **For clarity I found the log of the odds. The coeff on HS is 1.127. So, HS participants
 // have a 12.7 percent higher odds of graduating HS.
 ////Important note: There were many missing values, calling into quetion the data set.
