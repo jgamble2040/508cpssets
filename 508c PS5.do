@@ -90,7 +90,8 @@ reg conscripted eligible, robust
 
 local controls birthyr indigenous naturalized
 reg conscripted eligible `controls', robust
-reg conscripted eligible birthyr, robust
+reg conscripted eligible i.birthyr
+estimates store first_stage
 //Use birthyear fixed effect as there was a downward bias in X due to OVB.
 //No need to use identity controls as they were not significant.
 
@@ -99,49 +100,58 @@ reg conscripted eligible birthyr, robust
 ********************************************************************************
 //comment code if it needs some explanations//
 
-reg conscripted eligible birthyr, robust
-predict double zhat
+reg crimerate eligible i.birthyr
+estimates store reduced_form
+suest first_stage reduced_form, robust
+nlcom [reduced_form_mean]eligible/[first_stage_mean]eligible
+//Coefficient is 0.0027 and significant. Increase in probability of crime if conscripted
 
-reg crimerate zhat birthyr, robust
-//Coefficient is 0.0027 and significant.
+sum crimerate if eligible==0
 
-reg property zhat birthyr, robust
-//Coefficient is 0.0008 and p-value .016.
+di .0027/.068
+//Increase is .0397
 
-reg murder zhat birthyr, robust
-//Coefficient is -0.000055 and NOT significant.
+foreach var of varlist property murder drug sexual threat arms whitecollar {
+	reg `var' eligible i.birthyr
+	estimates store reduced_form
+	suest first_stage reduced_form, robust
+	nlcom [reduced_form_mean]eligible/[first_stage_mean]eligible
+}
 
-reg drug zhat birthyr, robust
-//Coefficient is -0.000068 and NOT significant.
-
-reg sexual zhat birthyr, robust
-//Coefficient is 0.00014 and NOT significant.
-
-reg threat zhat birthyr, robust
-//Coefficient is 0.00022 and NOTsignificant.
-
-
-reg arms zhat birthyr, robust
-//Coefficient is 0.00012 and NOT significant.
-
-
-reg whitecollar zhat birthyr, robust
-//Coefficient is 0.0006 and significant.
 
 ********************************************************************************
 **                                   P6                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
+//See above.
 
 ********************************************************************************
 **                                   P7                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
 
+ivregress 2sls crimerate (conscripted=eligible) i.birthyr, robust
+//finding is similar but a little higher than that of the OLS. Eligibility is 
+//capturing the exogenous effects of conscription on crime.
+
+foreach var of varlist property murder drug sexual threat arms whitecollar{
+	ivregress 2sls `var' (conscripted=eligible) i.birthyr, robust
+}
 ********************************************************************************
 **                                   P8                                       **
 ********************************************************************************
 //comment code if it needs some explanations//
+//To test significance of IV, eligibility must be correlated with conscription 
+//and not correlated with any other.
+
+correlate eligible conscripted
+//coeff is .987
+
+foreach var of varlist crimerate murder property drug sexual whitecollar arms threat {
+	correlate eligible `var'
+}
+//Numbers look low but run F-test to be  sure
+reg eligible crimerate murder property drug sexual whitecollar arms threat
 
 ********************************************************************************
 **                                   P9                                       **
