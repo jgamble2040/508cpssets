@@ -152,6 +152,9 @@ foreach var of varlist crimerate murder property drug sexual whitecollar arms th
 }
 //Numbers look low but run F-test to be  sure
 reg eligible crimerate murder property drug sexual whitecollar arms threat
+test crimerate murder property drug sexual whitecollar arms threat
+//F-stat is 2.88 prob is .0034
+//Eligibility is a viable IV
 
 ********************************************************************************
 **                                   P9                                       **
