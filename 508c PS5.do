@@ -24,7 +24,7 @@ foreach var of varlist crimerate conscripted {
 	graph bar `var', over(birthyr)
 }
 graph bar arms, over(birthyr)
-//Crime rates raee rougly the same for all birth years. The year 1958 has a 
+//Crime rates are rougly the same for all birth years. The year 1958 has a 
 //slightly higher conscription rate.
 ********************************************************************************
 **                                   P2                                       **
@@ -32,34 +32,42 @@ graph bar arms, over(birthyr)
 //Relationship between conscription and different types of crime//
 local controls birthyr indigenous naturalized
 reg crimerate conscripted `controls', robust
+outreg2 using OLS.doc, replace ctitle (CrimeRate)
 //coefficient on conscripted is 0.002 and significant.
 
 local controls birthyr indigenous naturalized
 reg property conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Property)
 //coefficient on conscripted is 0.00084 and significant.
 
 local controls birthyr indigenous naturalized
 reg murder conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Murder)
 //coefficient on conscripted is -0.00004 and NOT significant.
 
 local controls birthyr indigenous naturalized
 reg drug conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Drug)
 //coefficient on conscripted is -0.000046 and NOT significant.
 
 local controls birthyr indigenous naturalized
 reg sexual conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Sexual)
 //coefficient on conscripted is 0.00016 and only significant at 10 percent.
 
 local controls birthyr indigenous naturalized
 reg threat conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Threat)
 //coefficient on conscripted is 0.00027 and NOT significant.
 
 local controls birthyr indigenous naturalized
 reg arms conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (Arms)
 //coefficient on conscripted is 0.00013 and NOT significant.
 
 local controls birthyr indigenous naturalized
 reg whitecollar conscripted `controls', robust
+outreg2 using OLS.doc, append ctitle (WhiteCollar)
 //coefficient on conscripted is 0.00064 and significant.
 
 //The very small coefficients and lack of significance reflect the potential
@@ -82,6 +90,7 @@ replace eligible=1 if birthyr==1961 & draftnumber>=350
 replace eligible=0 if birthyr==1961 & draftnumber<350
 replace eligible=1 if birthyr==1962 & draftnumber>=320
 replace eligible=0 if birthyr==1962 & draftnumber<320
+tab eligible birthyr, row
 ********************************************************************************
 **                                   P4                                       **
 ********************************************************************************
@@ -161,7 +170,11 @@ test crimerate murder property drug sexual whitecollar arms threat
 ********************************************************************************
 //comment code if it needs some explanations//
 
+//LATE BUT NO TOT
 ********************************************************************************
 **                                   P10                                      **
 ********************************************************************************
 //comment code if it needs some explanations//
+//DIFFERENT COUNTRIES
+//MANDATORY SERVICE
+//NO RANDOMIZATION
